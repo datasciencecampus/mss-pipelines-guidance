@@ -1,0 +1,369 @@
+---
+title: "Standalone batch task on Cloud Run Jobs"
+description: "Build a maintainable, scalable, and sustainable batch task and run it locally and on Cloud Run Jobs."
+---
+
+This tutorial walks you through creating a standalone, batch-style task and running it locally and on Cloud Run Jobs. The example uses data ingestion (download CSV, validate, write Parquet, upload to Cloud Storage), but you can swap the task logic for any job.
+
+**Estimated time:** 60 to 90 minutes.
+
+**Outcome:** a containerized batch task you can run locally and on Cloud Run Jobs, with secure access to Cloud Storage.
+
+The steps are written with MSS principles in mind:
+
+- Maintainable: clear configuration, small focused task, explicit dependencies.
+- Scalable: containerized workload, Cloud Run Jobs runtime.
+- Sustainable: minimal permissions, clean up resources after use.
+
+## What you will build
+
+A Python task that:
+
+- Downloads a CSV from a public URL.
+- Validates a subset of columns with Pandera.
+- Writes a Parquet output.
+- Uploads the Parquet file to a non-public GCS bucket.
+
+You can replace the ingestion logic with any other batch task (e.g., API calls, ETL, reporting).
+
+## Before you start
+
+You will need:
+
+- A sandbox Google Cloud project you can deploy to.
+- Docker and the gcloud CLI installed locally.
+
+You should also be able to:
+
+- Run the task locally with Python.
+- Run the task in a container.
+- Deploy the container to a batch runtime like Cloud Run Jobs.
+
+## Step 1: Log in, set project config, and enable services
+
+First, log in and set your project and region. This config is reused throughout the tutorial. Replace `your-project-id` with your sandbox project ID.
+
+```bash
+gcloud auth login
+
+export PROJECT_ID="your-project-id"
+export REGION="europe-west2"
+
+gcloud config set project ${PROJECT_ID}
+gcloud config set run/region ${REGION}
+```
+
+Now enable the APIs used by Artifact Registry, Cloud Run Jobs, and Cloud Storage.
+
+```bash
+gcloud services enable \
+  artifactregistry.googleapis.com \
+  run.googleapis.com \
+  storage.googleapis.com
+```
+
+## Step 2: Set names and configuration
+
+These variables keep the commands consistent. You can change them later, but keep the names stable while you follow the tutorial.
+
+```bash
+export PROJECT_NUMBER="$(gcloud projects describe ${PROJECT_ID} --format='value(projectNumber)')"
+export DST_BUCKET="sv-data-bucket__${PROJECT_NUMBER}"
+export OUTPUT_FILE="data.parquet"
+export SOURCE_URL="https://raw.githubusercontent.com/owid/co2-data/master/owid-co2-data.csv"
+export SA_NAME="data-handler"
+export SA_EMAIL="${SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
+export SA_KEY_DIR="$HOME/SA-KEYS"
+export ARTIFACT_REPO="cloud-run-repo"
+export IMAGE_NAME="import-data-img"
+export IMAGE_TAG="latest"
+export IMAGE_URI="${REGION}-docker.pkg.dev/${PROJECT_ID}/${ARTIFACT_REPO}/${IMAGE_NAME}:${IMAGE_TAG}"
+export JOB_NAME="import-data-job"
+```
+
+Variable reference:
+
+| Variable | Meaning |
+| --- | --- |
+| `PROJECT_ID` | Your Google Cloud project ID. |
+| `REGION` | Region for Artifact Registry and Cloud Run Jobs. |
+| `PROJECT_NUMBER` | Numeric project identifier used by some Google Cloud services. |
+| `DST_BUCKET` | Destination bucket name for outputs. |
+| `OUTPUT_FILE` | Output filename to write. |
+| `SOURCE_URL` | URL to download the source CSV from. |
+| `SA_NAME` | Service account name for the task. |
+| `SA_EMAIL` | Service account email for the task. |
+| `SA_KEY_DIR` | Local folder to store service account keys. |
+| `ARTIFACT_REPO` | Artifact Registry repository name. |
+| `IMAGE_NAME` | Container image name. |
+| `IMAGE_TAG` | Image tag. |
+| `IMAGE_URI` | Full Artifact Registry image URI. |
+| `JOB_NAME` | Cloud Run Job name. |
+
+## Step 3: Create the destination bucket
+
+The task writes Parquet to a non-public GCS bucket.
+
+Create the destination bucket (non-public access):
+
+```bash
+gcloud storage buckets create "gs://${DST_BUCKET}" \
+  --location=${REGION} \
+  --public-access-prevention \
+  --uniform-bucket-level-access
+```
+
+## Step 4: Create and authorize a service account
+
+Create a service account for the task and grant it object admin access to the bucket. This is the identity Cloud Run Jobs will use.
+
+```bash
+gcloud iam service-accounts create "${SA_NAME}" \
+  --display-name="Standalone task service account"
+
+gcloud storage buckets add-iam-policy-binding "gs://${DST_BUCKET}" \
+  --member="serviceAccount:${SA_EMAIL}" \
+  --role="roles/storage.objectAdmin"
+```
+
+For local runs, create a key and point `GOOGLE_APPLICATION_CREDENTIALS` at it.
+
+```bash
+mkdir -p "${SA_KEY_DIR}"  # Creates the folder if it does not exist
+
+gcloud iam service-accounts keys create "${SA_KEY_DIR}/service-account.json" \
+  --iam-account=${SA_EMAIL}
+
+export GOOGLE_APPLICATION_CREDENTIALS="${SA_KEY_DIR}/service-account.json"
+```
+
+## Step 5: Create the task code
+
+Create a new folder under the repo root, for example `import-data`, and add a `main.py` file. This example script downloads a CSV, validates it, writes Parquet, and uploads to GCS. Replace the logic inside `main()` for other batch tasks.
+
+```python
+import os
+import logging
+import pandas as pd
+from google.cloud import storage
+from pandera import Column, DataFrameSchema, Check
+from pandera.errors import SchemaError
+
+# Config (or environment variables)
+DST_BUCKET = os.environ.get("DST_BUCKET", "sv-data-bucket__${PROJECT_NUMBER}")
+OUTPUT_FILE = os.environ.get("OUTPUT_FILE", "data.parquet")
+SOURCE_URL = os.environ.get(
+    "SOURCE_URL",
+    "https://raw.githubusercontent.com/owid/co2-data/master/owid-co2-data.csv"
+)
+
+schema = DataFrameSchema(
+    {
+        "country": Column(str, nullable=False),
+        "year": Column(int, nullable=False, checks=Check.ge(1750)),
+        "iso_code": Column(str, nullable=True, checks=Check.str_length(3, 3)),
+        "population": Column(float, nullable=True, checks=Check.ge(0)),
+        "gdp": Column(float, nullable=True, checks=Check.ge(0)),
+        "co2": Column(float, nullable=True),
+        "co2_per_capita": Column(float, nullable=True),
+        "co2_per_gdp": Column(float, nullable=True),
+        "co2_including_luc": Column(float, nullable=True),
+        "co2_including_luc_per_capita": Column(float, nullable=True),
+        "energy_per_capita": Column(float, nullable=True),
+        "primary_energy_consumption": Column(float, nullable=True),
+        "trade_co2": Column(float, nullable=True),
+        "trade_co2_share": Column(float, nullable=True),
+    },
+    strict=False,
+)
+
+def main():
+    logging.basicConfig(level=logging.INFO)
+
+    # Create a client
+    client = storage.Client()
+
+    try:
+        if not SOURCE_URL:
+            raise ValueError("SOURCE_URL is required")
+
+        df = pd.read_csv(SOURCE_URL)
+
+        # Validate the DataFrame against the schema
+        validated_df = schema.validate(df)
+
+        # Write the DataFrame to a Parquet file
+        validated_df.to_parquet(OUTPUT_FILE, index=False)
+
+        # Upload the Parquet file to the destination bucket
+        dst_bucket = client.bucket(DST_BUCKET)
+        dst_blob = dst_bucket.blob(OUTPUT_FILE)
+        dst_blob.upload_from_filename(OUTPUT_FILE)
+        logging.info("Import succeeded: %s -> %s/%s", SOURCE_URL, DST_BUCKET, OUTPUT_FILE)
+
+    except SchemaError:
+        logging.exception("Schema validation failed.")
+        raise
+    except Exception:
+        logging.exception("Import failed.")
+        raise
+    finally:
+        if os.path.exists(OUTPUT_FILE):
+            os.remove(OUTPUT_FILE)
+
+if __name__ == "__main__":
+    main()
+```
+
+## Step 6: Add dependencies
+
+Create `requirements.txt` in your task folder:
+
+```
+google-cloud-storage==3.9.0
+pandas==3.0.1
+pandera==0.29.0
+pyarrow==23.0.1
+```
+
+## Step 7: Add a Dockerfile
+
+Create a `Dockerfile` in the task folder:
+
+```Dockerfile
+FROM python:3.13-slim
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+# Set your environment variables here or via Cloud Run UI
+ENV DST_BUCKET=sv-data-bucket__YOUR_PROJECT_NUMBER
+ENV OUTPUT_FILE=data.parquet
+ENV SOURCE_URL=https://raw.githubusercontent.com/owid/co2-data/master/owid-co2-data.csv
+ENV DISABLE_PANDERA_IMPORT_WARNING=True
+
+CMD ["python", "main.py"]
+```
+
+## Step 8: Run locally
+
+From your task folder:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python main.py
+```
+
+## Step 9: Run as a local container
+
+From your task folder:
+
+```bash
+docker build -t my-task:local .
+
+# Run with the service account key mounted into the container.
+docker run --rm \
+  -e GOOGLE_APPLICATION_CREDENTIALS=/tmp/sa-key.json \
+  -e DST_BUCKET=${DST_BUCKET} \
+  -e OUTPUT_FILE=${OUTPUT_FILE} \
+  -e SOURCE_URL=${SOURCE_URL} \
+  -v "${SA_KEY_DIR}/service-account.json:/tmp/sa-key.json:ro" \
+  my-task:local
+```
+
+## Step 10: Deploy as a Cloud Run Job
+
+This example uses Cloud Run Jobs for batch execution. Replace the values with your project and region.
+
+```bash
+gcloud artifacts repositories create ${ARTIFACT_REPO} \
+  --location=${REGION} \
+  --repository-format=docker
+
+gcloud auth configure-docker ${REGION}-docker.pkg.dev
+
+docker buildx build --platform linux/amd64 \
+  -t ${IMAGE_URI} \
+  --push .
+
+gcloud run jobs create ${JOB_NAME} \
+  --image ${IMAGE_URI} \
+  --region ${REGION} \
+  --service-account ${SA_EMAIL}
+
+gcloud run jobs execute ${JOB_NAME} --region ${REGION}
+```
+
+## Step 11: Configure runtime settings
+
+You can override runtime settings at job creation time.
+
+```bash
+gcloud run jobs create ${JOB_NAME} \
+  --image ${IMAGE_URI} \
+  --region ${REGION} \
+  --set-env-vars SOURCE_URL=https://raw.githubusercontent.com/owid/co2-data/master/owid-co2-data.csv,OUTPUT_FILE=data.parquet,DST_BUCKET=sv-data-bucket__${PROJECT_NUMBER}
+```
+
+For service account keys, prefer Workload Identity or attach a service account to the job instead of embedding credentials in the image.
+
+## Step 12: Clean up local keys
+
+Delete the service account key after local runs to reduce risk.
+
+```bash
+gcloud iam service-accounts keys list --iam-account ${SA_EMAIL}
+
+# Replace KEY_ID with the value from the list command.
+gcloud iam service-accounts keys delete KEY_ID --iam-account ${SA_EMAIL}
+```
+
+## Step 13: Remove billable cloud artifacts
+
+Clean up Cloud Run, Artifact Registry, and Cloud Storage resources that can incur costs.
+
+```bash
+# Delete the Cloud Run Job.
+gcloud run jobs delete ${JOB_NAME} --region ${REGION}
+
+# Delete the Artifact Registry image and repository.
+gcloud artifacts docker images delete ${IMAGE_URI} --delete-tags --quiet
+gcloud artifacts repositories delete ${ARTIFACT_REPO} --location ${REGION}
+
+# Delete the bucket and all objects.
+gcloud storage rm -r "gs://${DST_BUCKET}"
+
+# Delete the service account.
+gcloud iam service-accounts delete ${SA_EMAIL}
+
+# Optional: delete the local Docker image.
+docker rmi my-task:local
+```
+
+## Troubleshooting
+
+- If Cloud Run says the image is not found, confirm the image was pushed to Artifact Registry.
+- If deployment fails on Apple Silicon, rebuild with `--platform linux/amd64`.
+- If the job starts but fails, check logs:
+
+```bash
+gcloud run jobs executions list --job ${JOB_NAME} --region ${REGION}
+```
+
+Use the execution name to view logs in the Cloud Console.
+
+## Summary
+
+You created a standalone batch task, wired it to Cloud Storage with a service account, validated a CSV with Pandera, and ran the container locally and on Cloud Run Jobs. You can now swap the `main()` logic for any batch job you need.
+
+### MSS checklist
+
+- Maintainable: configuration is in env vars and dependencies are pinned.
+- Scalable: the task runs in a container and deploys to Cloud Run Jobs.
+- Sustainable: access is limited to a service account and you clean up billable resources.
