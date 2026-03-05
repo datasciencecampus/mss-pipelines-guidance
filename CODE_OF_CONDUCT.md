@@ -2,6 +2,8 @@
 
 Contributors to repositories hosted by the Office for National Statistics (ONS) must follow this Code of Conduct and adhere to the [Civil Service Code](https://www.gov.uk/government/publications/civil-service-code/the-civil-service-code).
 
+For contribution workflow and conventions, see [CONTRIBUTING.md](CONTRIBUTING.md).
+
 > Terminology:
 >
 > * "project" refers to ONS repositories and associated collaboration spaces.

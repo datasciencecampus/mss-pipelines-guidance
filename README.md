@@ -44,3 +44,4 @@ See [LICENSE](LICENSE).
 
 - Keep content aligned with Maintainable, Scalable, and Sustainable (MSS) principles.
 - Use the existing Diataxis sections for new content.
+- Full contribution guidance: [CONTRIBUTING.md](CONTRIBUTING.md)
