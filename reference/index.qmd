@@ -1,0 +1,9 @@
+---
+title: "Reference"
+---
+
+Add technical reference material here. Prefer concise, factual content.
+
+## Next
+
+- Add your first reference page in this folder and link it here.

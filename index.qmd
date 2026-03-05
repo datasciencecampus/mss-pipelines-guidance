@@ -1,0 +1,29 @@
+---
+title: "MSS Pipelines Guidance"
+---
+
+Welcome. This site is organized using the Diataxis documentation model.
+
+## Tutorials
+
+Step-by-step learning journeys for new users.
+
+- [Start here](tutorials/index.qmd)
+
+## How-to guides
+
+Task-focused instructions for getting work done.
+
+- [Browse how-to guides](how-to/index.qmd)
+
+## Reference
+
+Technical details and specifications.
+
+- [Read the reference](reference/index.qmd)
+
+## Explanation
+
+Background, rationale, and concepts.
+
+- [Learn more](explanation/index.qmd)
