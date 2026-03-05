@@ -2,7 +2,7 @@
 title: "How-to guides"
 ---
 
-Add task-based guides here. Each guide should answer a specific question.
+Add task-based guides here. Each guide should answer a specific question and reinforce Maintainable, Scalable, and Sustainable (MSS) practices.
 
 ## Next
 

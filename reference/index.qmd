@@ -2,7 +2,7 @@
 title: "Reference"
 ---
 
-Add technical reference material here. Prefer concise, factual content.
+Add technical reference material here. Prefer concise, factual content for Maintainable, Scalable, and Sustainable (MSS) pipelines.
 
 ## Next
 

@@ -2,28 +2,28 @@
 title: "MSS Pipelines Guidance"
 ---
 
-Welcome. This site is organized using the Diataxis documentation model.
+Welcome. MSS stands for Maintainable, Scalable, and Sustainable. This site shows how to build pipelines with those qualities and is organized using the Diataxis documentation model.
 
 ## Tutorials
 
-Step-by-step learning journeys for new users.
+Step-by-step learning journeys for new users, with MSS principles baked in.
 
 - [Start here](tutorials/index.qmd)
 
 ## How-to guides
 
-Task-focused instructions for getting work done.
+Task-focused instructions for getting work done in an MSS way.
 
 - [Browse how-to guides](how-to/index.qmd)
 
 ## Reference
 
-Technical details and specifications.
+Technical details and specifications for MSS pipelines.
 
 - [Read the reference](reference/index.qmd)
 
 ## Explanation
 
-Background, rationale, and concepts.
+Background, rationale, and concepts behind Maintainable, Scalable, and Sustainable pipelines.
 
 - [Learn more](explanation/index.qmd)

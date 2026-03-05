@@ -2,7 +2,7 @@
 title: "Tutorials"
 ---
 
-Add step-by-step tutorials here. Keep each tutorial focused and hands-on.
+Add step-by-step tutorials here. Keep each tutorial focused and hands-on while teaching Maintainable, Scalable, and Sustainable (MSS) habits.
 
 ## Next
 
