@@ -30,6 +30,7 @@ This renders the site to the `_site/` directory.
 ## Publishing
 
 The GitHub Actions workflow in `.github/workflows/quarto-publish.yml` builds and deploys the site to GitHub Pages from the `main` branch.
+Release notes are generated automatically by GitHub when the workflow creates a release.
 
 ## Project policies
 
