@@ -3,6 +3,7 @@ project:
 
 website:
   title: "MSS Pipelines Guidance"
+  repo-url: "https://github.com/datasciencecampus/mss-pipelines-guidance"
   navbar:
     left:
       - text: "Home"
@@ -15,6 +16,14 @@ website:
         href: reference/index.qmd
       - text: "Explanation"
         href: explanation/index.qmd
+    right:
+      - icon: github
+        href: "https://github.com/datasciencecampus/mss-pipelines-guidance"
+        aria-label: "View repository on GitHub"
+      - icon: bug
+        text: "Report issue"
+        href: "https://github.com/datasciencecampus/mss-pipelines-guidance/issues/new/choose"
+        aria-label: "Report an issue"
   sidebar:
     style: "docked"
     contents:
@@ -33,5 +42,8 @@ website:
 
 format:
   html:
-    theme: default
+    theme:
+      light: simplex
+      dark: darkly
+    theme-toggle: true
     toc: true
