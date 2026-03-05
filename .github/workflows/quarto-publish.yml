@@ -3,6 +3,15 @@ name: Publish Quarto site
 on:
   push:
     branches: [main]
+    paths:
+      - "_quarto.yml"
+      - "index.qmd"
+      - "**/*.qmd"
+      - "includes/**"
+      - "assets/**"
+      - "styles/**"
+      - "package.json"
+      - "package-lock.json"
 
 permissions:
   contents: read
@@ -44,3 +53,83 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+  release:
+    runs-on: ubuntu-latest
+    needs: deploy
+    permissions:
+      contents: write
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Guard against newer runs
+        id: guard
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data } = await github.rest.actions.listWorkflowRunsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              per_page: 50
+            });
+
+            const newer = data.workflow_runs.find(run =>
+              run.name === context.workflow &&
+              run.run_number > context.runNumber &&
+              (run.status === "queued" || run.status === "in_progress")
+            );
+
+            core.setOutput("skip", newer ? "true" : "false");
+
+      - name: Determine next tag
+        id: version
+        uses: actions/github-script@v7
+        if: steps.guard.outputs.skip != 'true'
+        with:
+          script: |
+            const { data: tags } = await github.rest.repos.listTags({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              per_page: 100
+            });
+            const semverTags = tags
+              .map(tag => tag.name)
+              .filter(name => /^v\d+\.\d+\.\d+$/.test(name));
+
+            if (semverTags.length === 0) {
+              core.setOutput("next", "v0.1.0");
+              return;
+            }
+
+            const parse = value => value.replace(/^v/, "").split(".").map(Number);
+            semverTags.sort((a, b) => {
+              const pa = parse(a);
+              const pb = parse(b);
+              for (let i = 0; i < 3; i += 1) {
+                if (pa[i] !== pb[i]) {
+                  return pa[i] - pb[i];
+                }
+              }
+              return 0;
+            });
+
+            const latest = semverTags[semverTags.length - 1];
+            const [major, minor, patch] = parse(latest);
+            const next = `v${major}.${minor}.${patch + 1}`;
+            core.setOutput("next", next);
+
+      - name: Create tag
+        if: steps.guard.outputs.skip != 'true'
+        run: |
+          git tag "${{ steps.version.outputs.next }}"
+          git push origin "${{ steps.version.outputs.next }}"
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        if: steps.guard.outputs.skip != 'true'
+        with:
+          tag_name: "${{ steps.version.outputs.next }}"
+          generate_release_notes: true
