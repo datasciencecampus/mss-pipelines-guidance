@@ -129,7 +129,7 @@ gcloud storage buckets add-iam-policy-binding "gs://${DST_BUCKET}" \
 For local runs, create a key and point `GOOGLE_APPLICATION_CREDENTIALS` at it.
 
 ```bash
-mkdir -p "${SA_KEY_DIR}"  # Creates the folder if it does not exist
+mkdir -p "${SA_KEY_DIR}"
 
 gcloud iam service-accounts keys create "${SA_KEY_DIR}/service-account.json" \
   --iam-account=${SA_EMAIL}
