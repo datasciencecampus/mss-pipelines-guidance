@@ -228,7 +228,10 @@ pyarrow==23.0.1
 
 ## Step 7: Add a Dockerfile
 
+
 Create a `Dockerfile` in the task folder:
+
+> **Important:** In the Dockerfile below, update `YOUR_PROJECT_NUMBER` in the `ENV DST_BUCKET=sv-data-bucket__YOUR_PROJECT_NUMBER` line to match your actual Google Cloud project number. This is required for the batch task to upload to the correct bucket.
 
 ```Dockerfile
 FROM python:3.13-slim
