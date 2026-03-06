@@ -285,8 +285,6 @@ docker run --rm \
 
 ## Step 10: Deploy as a Cloud Run Job
 
-## Step 10: Deploy as a Cloud Run Job
-
 > **Note:** The `gcloud run jobs create` command will fail if a job with the same name (`${JOB_NAME}`) already exists in your project and region. Cloud Run Job IDs must be unique. If you need to re-create a job, delete the existing one first or use a different job name.
 
 This example uses Cloud Run Jobs for batch execution.
@@ -327,10 +325,14 @@ For service account keys, prefer Workload Identity or attach a service account t
 
 Delete the service account key after local runs to reduce risk.
 
+
 ```bash
 gcloud iam service-accounts keys list --iam-account ${SA_EMAIL}
+```
 
-# Replace KEY_ID with the value from the list command.
+Run the following command to delete a key, replacing `KEY_ID` with the value from the list command:
+
+```bash
 gcloud iam service-accounts keys delete KEY_ID --iam-account ${SA_EMAIL}
 ```
 
