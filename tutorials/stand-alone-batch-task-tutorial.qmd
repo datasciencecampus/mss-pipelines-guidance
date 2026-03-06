@@ -107,7 +107,11 @@ Variable reference:
 
 The task writes Parquet to a non-public GCS bucket.
 
+
 Create the destination bucket (non-public access):
+
+> **What to expect in GCP:**
+> After running the command below, you should see a new bucket appear in the Google Cloud Console under **Cloud Storage > Buckets** with the name you specified in `${DST_BUCKET}`. This confirms the bucket was created successfully.
 
 ```bash
 gcloud storage buckets create "gs://${DST_BUCKET}" \
@@ -118,7 +122,11 @@ gcloud storage buckets create "gs://${DST_BUCKET}" \
 
 ## Step 4: Create and authorize a service account
 
+
 Create a service account for the task and grant it object admin access to the bucket. This is the identity Cloud Run Jobs will use.
+
+> **What to expect in GCP:**
+> After running the commands below, you should see a new service account appear in the Google Cloud Console under **IAM & Admin > Service Accounts** with the name `${SA_NAME}`. The bucket's permissions will also show this service account as having the Storage Object Admin role.
 
 ```bash
 gcloud iam service-accounts create "${SA_NAME}" \
@@ -232,6 +240,7 @@ pyarrow==23.0.1
 ## Step 7: Add a Dockerfile
 
 
+
 Create a `Dockerfile` in the task folder:
 
 > **Important:** In the Dockerfile below, update `YOUR_PROJECT_NUMBER` in the `ENV DST_BUCKET=sv-data-bucket__YOUR_PROJECT_NUMBER` line to match your actual Google Cloud project number. This is required for the batch task to upload to the correct bucket.
@@ -287,7 +296,13 @@ docker run --rm \
 
 > **Note:** The `gcloud run jobs create` command will fail if a job with the same name (`${JOB_NAME}`) already exists in your project and region. Cloud Run Job IDs must be unique. If you need to re-create a job, delete the existing one first or use a different job name.
 
+
 This example uses Cloud Run Jobs for batch execution.
+
+> **What to expect in GCP:**
+> - After running the Artifact Registry creation command, you should see a new repository under **Artifact Registry > Repositories** named `${ARTIFACT_REPO}`.
+> - After pushing the image, you should see your container image listed in this repository.
+> - After creating the Cloud Run Job, you should see a new job under **Cloud Run > Jobs** with the name `${JOB_NAME}`. When you execute the job, you can monitor its status and logs in the Cloud Console.
 
 ```bash
 gcloud artifacts repositories create ${ARTIFACT_REPO} \
