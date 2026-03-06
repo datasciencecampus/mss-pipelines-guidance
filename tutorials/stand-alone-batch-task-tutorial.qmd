@@ -285,7 +285,7 @@ docker run --rm \
 
 ## Step 10: Deploy as a Cloud Run Job
 
-This example uses Cloud Run Jobs for batch execution. Replace the values with your project and region.
+This example uses Cloud Run Jobs for batch execution.
 
 ```bash
 gcloud artifacts repositories create ${ARTIFACT_REPO} \
