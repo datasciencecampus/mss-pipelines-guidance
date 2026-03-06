@@ -285,6 +285,10 @@ docker run --rm \
 
 ## Step 10: Deploy as a Cloud Run Job
 
+## Step 10: Deploy as a Cloud Run Job
+
+> **Note:** The `gcloud run jobs create` command will fail if a job with the same name (`${JOB_NAME}`) already exists in your project and region. Cloud Run Job IDs must be unique. If you need to re-create a job, delete the existing one first or use a different job name.
+
 This example uses Cloud Run Jobs for batch execution.
 
 ```bash
