@@ -18,6 +18,7 @@ Contributions are currently limited to ONS colleagues.
 3. Create a branch and make your changes.
 4. Open a pull request that links to your issue.
 5. We will review and merge approved changes.
+	- Release notes are generated automatically by GitHub from merged changes when a release is created.
 
 ## What to include in your change
 

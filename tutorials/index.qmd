@@ -6,4 +6,4 @@ Add step-by-step tutorials here. Keep each tutorial focused and hands-on while t
 
 ## Next
 
-- Add your first tutorial page in this folder and link it here.
+- [Standalone batch task on Cloud Run Jobs](stand-alone-batch-task-tutorial.qmd)
