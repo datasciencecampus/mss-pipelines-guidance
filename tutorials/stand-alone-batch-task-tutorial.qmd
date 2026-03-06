@@ -282,7 +282,6 @@ From your task folder:
 ```bash
 docker build -t my-task:local .
 
-# Run with the service account key mounted into the container.
 docker run --rm \
   -e GOOGLE_APPLICATION_CREDENTIALS=/tmp/sa-key.json \
   -e DST_BUCKET=${DST_BUCKET} \
@@ -356,20 +355,15 @@ gcloud iam service-accounts keys delete KEY_ID --iam-account ${SA_EMAIL}
 Clean up Cloud Run, Artifact Registry, and Cloud Storage resources that can incur costs.
 
 ```bash
-# Delete the Cloud Run Job.
 gcloud run jobs delete ${JOB_NAME} --region ${REGION}
 
-# Delete the Artifact Registry image and repository.
 gcloud artifacts docker images delete ${IMAGE_URI} --delete-tags --quiet
 gcloud artifacts repositories delete ${ARTIFACT_REPO} --location ${REGION}
 
-# Delete the bucket and all objects.
 gcloud storage rm -r "gs://${DST_BUCKET}"
 
-# Delete the service account.
 gcloud iam service-accounts delete ${SA_EMAIL}
 
-# Optional: delete the local Docker image.
 docker rmi my-task:local
 ```
 
