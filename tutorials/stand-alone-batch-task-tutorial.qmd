@@ -3,6 +3,9 @@ title: "Standalone batch task on Cloud Run Jobs"
 description: "Build a maintainable, scalable, and sustainable batch task and run it locally and on Cloud Run Jobs."
 ---
 
+
+> **Note:** These instructions are written for Mac users. If you are using Windows or Linux, some commands (such as environment variable export, file paths, or activation of virtual environments) may differ. Adjust accordingly for your operating system.
+
 This tutorial walks you through creating a standalone, batch-style task and running it locally and on Cloud Run Jobs. The example uses data ingestion (download CSV, validate, write Parquet, upload to Cloud Storage), but you can swap the task logic for any job.
 
 **Estimated time:** 60 to 90 minutes.
