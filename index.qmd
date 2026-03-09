@@ -2,28 +2,39 @@
 title: "MSS Pipelines Guidance"
 ---
 
-Welcome. MSS stands for Maintainable, Scalable, and Sustainable. This site shows how to build pipelines with those qualities and is organized using the Diataxis documentation model.
+# Welcome to MSS Pipelines Guidance
 
-## Tutorials
+Design, build, and maintain data pipelines that are **Maintainable, Scalable, and Sustainable (MSS)**. This site is your one-stop resource for practical guides, technical reference, and foundational concepts—organised using the [Diátaxis documentation model](https://diataxis.fr/).
 
-Step-by-step learning journeys for new users, with MSS principles baked in.
+---
 
-- [Start here](tutorials/index.qmd)
+## Start Here
 
-## How-to guides
+- **What is End-to-End RAP?** — [Learn the concepts](explanation/end-to-end-rap.qmd)
+- **Quickstart Tutorial** — [Standalone batch task on Cloud Run Jobs](tutorials/stand-alone-batch-task-tutorial.qmd)
 
-Task-focused instructions for getting work done in an MSS way.
+---
 
+## Explore the Documentation
+
+### Tutorials
+Step-by-step learning journeys to help you get hands-on with MSS pipelines.
+- [All tutorials](tutorials/index.qmd)
+
+### How-to Guides
+Practical, task-focused instructions for real-world problems.
 - [Browse how-to guides](how-to/index.qmd)
 
-## Reference
-
-Technical details and specifications for MSS pipelines.
-
+### Reference
+Technical details, specifications, and in-depth documentation.
 - [Read the reference](reference/index.qmd)
 
-## Explanation
+### Explanation
+Background, rationale, and key concepts behind MSS pipelines.
+- [More explanation topics](explanation/index.qmd)
 
-Background, rationale, and concepts behind Maintainable, Scalable, and Sustainable pipelines.
+---
 
-- [Learn more](explanation/index.qmd)
+## Get Involved
+
+Have a suggestion or notice something missing? [Raise an issue](https://github.com/datasciencecampus/mss-pipelines-guidance/issues) or, even better, [contribute to the project](CONTRIBUTING.md).

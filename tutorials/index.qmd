@@ -2,8 +2,12 @@
 title: "Tutorials"
 ---
 
-Add step-by-step tutorials here. Keep each tutorial focused and hands-on while teaching Maintainable, Scalable, and Sustainable (MSS) habits.
+Add step-by-step tutorials here. Each tutorial is focused and hands-on, teaching Maintainable, Scalable, and Sustainable (MSS) habits.
+
+## Available Tutorials
+
+- [Standalone batch task on Cloud Run Jobs](stand-alone-batch-task-tutorial.qmd)
 
 ## Next
 
-- [Standalone batch task on Cloud Run Jobs](stand-alone-batch-task-tutorial.qmd)
+- Add more tutorials in this folder and link them here to help users build MSS pipelines.
