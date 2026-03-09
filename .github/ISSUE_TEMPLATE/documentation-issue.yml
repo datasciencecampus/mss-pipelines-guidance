@@ -1,0 +1,34 @@
+name: Documentation Issue
+description: Report incorrect, unclear, or missing information in the documentation
+labels: [documentation]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Thanks for helping improve our docs!
+        Please describe the issue you found in the documentation.
+  - type: input
+    id: url
+    attributes:
+      label: Page or Section
+      description: Which page or section has the issue?
+      placeholder: e.g. /tutorials/stand-alone-batch-task-tutorial
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What is the issue?
+      description: Describe what is incorrect, unclear, or missing.
+      placeholder: Tell us what you found (e.g. typo, outdated info, unclear explanation).
+    validations:
+      required: true
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested Correction (optional)
+      description: If you know how to fix it, let us know!
+      placeholder: Suggest a correction, better wording, or a link to the right info.
+    validations:
+      required: false
