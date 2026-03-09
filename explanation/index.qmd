@@ -4,6 +4,10 @@ title: "Explanation"
 
 Add conceptual explanations here. Explain the why, not just the how, with emphasis on Maintainable, Scalable, and Sustainable (MSS) pipelines.
 
+## Key Topics
+
+- [End-to-End RAP: Beyond Reproducible Analytical Pipelines](end-to-end-rap.qmd)
+
 ## Next
 
-- Add your first explanation page in this folder and link it here.
+- Add more explanation pages in this folder and link them here.
