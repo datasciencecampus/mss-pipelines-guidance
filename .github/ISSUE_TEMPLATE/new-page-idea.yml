@@ -1,0 +1,35 @@
+name: New Page Idea
+description: Suggest a new page or topic for the site
+title: "[Page Idea]: "
+labels: [enhancement, idea]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Suggest a new page or topic
+        Help us improve the site by proposing new content!
+  - type: input
+    id: title
+    attributes:
+      label: Suggested Page Title
+      description: What should the new page be called?
+      placeholder: e.g. "How to Deploy on Cloud Run"
+    validations:
+      required: true
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary / Rationale
+      description: Briefly describe what the page should cover and why it's needed.
+      placeholder: What problem does it solve? Who is it for?
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: Details or Outline
+      description: Optional. Add any extra details, example sections, or resources.
+      placeholder: Section ideas, links, etc.
+    validations:
+      required: false
