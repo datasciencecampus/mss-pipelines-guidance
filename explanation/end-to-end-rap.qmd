@@ -13,6 +13,7 @@ Reproducible Analytical Pipelines (RAP) have transformed statistical production 
 ## Why Move Beyond Traditional RAP?
 
 While RAP has delivered major improvements, many implementations still:
+
 - Require manual data downloads or uploads
 - Depend on ad-hoc checks or manual edits
 - Rely on individuals to "press run" or deliver outputs
@@ -55,6 +56,7 @@ These gaps can lead to errors, inconsistencies, and a lack of trust in outputs. 
 ## Why Does End-to-End RAP Matter?
 
 End-to-end RAP delivers:
+
 - **Consistency:** Removes ambiguity and reduces the risk of human error.
 - **Trust:** Stakeholders can trust that results are produced the same way every time.
 - **Efficiency:** Reduces manual effort and frees up time for analysis, not administration.
@@ -65,6 +67,7 @@ End-to-end RAP delivers:
 ## Why Cloud?
 
 Cloud technologies provide the building blocks for end-to-end RAP:
+
 - **Orchestration:** Tools like Cloud Composer, Airflow, or managed workflows automate complex pipelines.
 - **Storage:** Secure, scalable storage for data and artefacts.
 - **Compute:** Consistent, reproducible environments for running code.
@@ -82,13 +85,14 @@ Adopting end-to-end RAP brings significant benefits, but it also introduces new 
 - **Change Management:** Teams may feel loss of flexibility or control, especially if manual workarounds are removed. There may be resistance to new tools or ways of working.
 - **Complexity:** Automation can introduce technical complexity, especially for bespoke or edge-case workflows. Debugging and monitoring automated systems may require new skills.
 - **Security and Compliance:** Cloud adoption raises questions about data security, privacy, and regulatory compliance. Access controls and audit trails must be robustly managed.
-- **Cultural Shift:** Moving to a fully auditable, automated process can feel restrictive to those used to "quick fixes" or informal checks. Trust in the system must be built over time.
+- **Pressure When Plans Change:** Fully auditable automation leaves less room for quick, informal fixes—beneficial for quality and traceability, but it can feel limiting when teams are under pressure to deliver to a deadline and things do not go to plan.
 
 ### Mitigations and Recommendations
 
 - **Phased Adoption:** Start with pilot projects or high-impact pipelines to demonstrate value. Gradually expand automation, allowing teams to build confidence and skills.
 - **Training and Support:** Invest in upskilling staff on cloud, automation, and workflow tools. Provide clear documentation and peer support networks.
 - **Transparent Communication:** Clearly explain the "why" behind changes, focusing on benefits for quality, trust, and efficiency. Acknowledge concerns and gather feedback throughout the process.
+- **Contingency Planning:** Build in explicit fallbacks for when runs fail (e.g., rollback steps, rerun playbooks, or manual approvals). This keeps delivery on track without relying on undocumented fixes.
 - **Balance Automation and Flexibility:** Where possible, design pipelines to allow safe, auditable interventions (e.g., parameter files, approval steps). Document any manual steps and plan to automate them over time.
 - **Robust Governance:** Establish clear policies for access, change management, and incident response. Regularly review and test security and compliance controls.
 - **Celebrate Successes:** Share stories of improved efficiency, reduced errors, or successful audits to build momentum.
