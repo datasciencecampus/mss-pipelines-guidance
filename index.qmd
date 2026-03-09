@@ -32,3 +32,9 @@ Technical details, specifications, and in-depth documentation.
 ### Explanation
 Background, rationale, and key concepts behind MSS pipelines.
 - [More explanation topics](explanation/index.qmd)
+
+---
+
+## Get Involved
+
+Have a suggestion or notice something missing? [Raise an issue](https://github.com/datasciencecampus/mss-pipelines-guidance/issues) or, even better, [contribute to the project](CONTRIBUTING.md).
