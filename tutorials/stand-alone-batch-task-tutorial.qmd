@@ -157,7 +157,7 @@ import os
 import logging
 import pandas as pd
 from google.cloud import storage
-from pandera import Column, DataFrameSchema, Check
+from pandera.pandas import Column, DataFrameSchema, Check
 from pandera.errors import SchemaError
 
 # Config (or environment variables)
