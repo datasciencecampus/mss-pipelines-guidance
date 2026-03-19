@@ -135,6 +135,10 @@ gcloud iam service-accounts create "${SA_NAME}" \
 gcloud storage buckets add-iam-policy-binding "gs://${DST_BUCKET}" \
   --member="serviceAccount:${SA_EMAIL}" \
   --role="roles/storage.objectAdmin"
+
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+  --member="serviceAccount:${SA_EMAIL}" \
+  --role="roles/serviceusage.serviceUsageConsumer"
 ```
 
 For local runs, create a key and point `GOOGLE_APPLICATION_CREDENTIALS` at it.
